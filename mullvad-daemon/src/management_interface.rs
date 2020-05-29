@@ -24,6 +24,8 @@ use mullvad_types::{
     ConnectionConfig,
 };
 use parking_lot::RwLock;
+#[cfg(windows)]
+use std::path::PathBuf;
 use std::{
     cmp,
     convert::{TryFrom, TryInto},
@@ -61,6 +63,7 @@ impl ManagementService for ManagementServiceImpl {
     type GetRelayLocationsStream =
         tokio::sync::mpsc::Receiver<Result<types::RelayListCountry, Status>>;
     type GetSplitTunnelProcessesStream = tokio::sync::mpsc::UnboundedReceiver<Result<i32, Status>>;
+    type GetSplitTunnelAppsStream = tokio::sync::mpsc::UnboundedReceiver<Result<String, Status>>;
     type EventsListenStream = EventsListenerReceiver;
 
     // Control and get the tunnel state
@@ -746,6 +749,98 @@ impl ManagementService for ManagementServiceImpl {
             Ok(Response::new(()))
         }
     }
+
+    async fn get_split_tunnel_apps(
+        &self,
+        _: Request<()>,
+    ) -> ServiceResult<Self::GetSplitTunnelAppsStream> {
+        #[cfg(windows)]
+        {
+            log::debug!("get_split_tunnel_apps");
+            let (tx, rx) = oneshot::channel();
+            self.send_command_to_daemon(DaemonCommand::GetSplitTunnelApps(tx))?;
+            let paths = rx.await.map_err(|_| Status::internal("internal error"))?;
+
+            let (tx, rx) = tokio::sync::mpsc::unbounded_channel();
+            tokio::spawn(async move {
+                for path in paths {
+                    let _ = tx.send(path.into_os_string().into_string().map_err(|os_path| {
+                        Status::internal(format!("failed to convert OS string: {:?}", os_path))
+                    }));
+                }
+            });
+
+            Ok(Response::new(rx))
+        }
+        #[cfg(not(windows))]
+        {
+            let (_, rx) = tokio::sync::mpsc::unbounded_channel();
+            Ok(Response::new(rx))
+        }
+    }
+
+    #[cfg(windows)]
+    async fn add_split_tunnel_app(&self, request: Request<String>) -> ServiceResult<()> {
+        log::debug!("add_split_tunnel_app");
+        let path = PathBuf::from(request.into_inner());
+        let (tx, rx) = oneshot::channel();
+        self.send_command_to_daemon(DaemonCommand::AddSplitTunnelApp(tx, path))?;
+        self.wait_for_result(rx)
+            .await?
+            .map_err(map_daemon_error)
+            .map(Response::new)
+    }
+    #[cfg(not(windows))]
+    async fn add_split_tunnel_app(&self, _: Request<String>) -> ServiceResult<()> {
+        Ok(Response::new(()))
+    }
+
+    #[cfg(windows)]
+    async fn remove_split_tunnel_app(&self, request: Request<String>) -> ServiceResult<()> {
+        log::debug!("remove_split_tunnel_app");
+        let path = PathBuf::from(request.into_inner());
+        let (tx, rx) = oneshot::channel();
+        self.send_command_to_daemon(DaemonCommand::RemoveSplitTunnelApp(tx, path))?;
+        self.wait_for_result(rx)
+            .await?
+            .map_err(map_daemon_error)
+            .map(Response::new)
+    }
+    #[cfg(not(windows))]
+    async fn remove_split_tunnel_app(&self, _: Request<String>) -> ServiceResult<()> {
+        Ok(Response::new(()))
+    }
+
+    #[cfg(windows)]
+    async fn clear_split_tunnel_apps(&self, _: Request<()>) -> ServiceResult<()> {
+        log::debug!("clear_split_tunnel_apps");
+        let (tx, rx) = oneshot::channel();
+        self.send_command_to_daemon(DaemonCommand::ClearSplitTunnelApps(tx))?;
+        self.wait_for_result(rx)
+            .await?
+            .map_err(map_daemon_error)
+            .map(Response::new)
+    }
+    #[cfg(not(windows))]
+    async fn clear_split_tunnel_apps(&self, _: Request<()>) -> ServiceResult<()> {
+        Ok(Response::new(()))
+    }
+
+    #[cfg(windows)]
+    async fn set_split_tunnel_state(&self, request: Request<bool>) -> ServiceResult<()> {
+        log::debug!("set_split_tunnel_state");
+        let enabled = request.into_inner();
+        let (tx, rx) = oneshot::channel();
+        self.send_command_to_daemon(DaemonCommand::SetSplitTunnelState(tx, enabled))?;
+        self.wait_for_result(rx)
+            .await?
+            .map_err(map_daemon_error)
+            .map(Response::new)
+    }
+    #[cfg(not(windows))]
+    async fn set_split_tunnel_state(&self, _: Request<bool>) -> ServiceResult<()> {
+        Ok(Response::new(()))
+    }
 }
 
 impl ManagementServiceImpl {
@@ -762,6 +857,20 @@ impl ManagementServiceImpl {
 }
 
 fn convert_settings(settings: &Settings) -> types::Settings {
+    #[cfg(windows)]
+    let split_tunnel_apps = {
+        let mut converted_list = vec![];
+        for path in settings.split_tunnel_apps.clone().iter() {
+            match path.as_path().as_os_str().to_str() {
+                Some(path) => converted_list.push(path.to_string()),
+                None => {
+                    log::error!("failed to convert OS string: {:?}", path);
+                }
+            }
+        }
+        converted_list
+    };
+
     types::Settings {
         account_token: settings.get_account_token().unwrap_or_default(),
         relay_settings: Some(convert_relay_settings(&settings.get_relay_settings())),
@@ -772,6 +881,14 @@ fn convert_settings(settings: &Settings) -> types::Settings {
         auto_connect: settings.auto_connect,
         tunnel_options: Some(convert_tunnel_options(&settings.tunnel_options)),
         show_beta_releases: settings.show_beta_releases,
+        #[cfg(windows)]
+        split_tunnel: settings.split_tunnel,
+        #[cfg(windows)]
+        split_tunnel_apps,
+        #[cfg(not(windows))]
+        split_tunnel: false,
+        #[cfg(not(windows))]
+        split_tunnel_apps: Vec::new(),
     }
 }
 
