@@ -18,6 +18,7 @@
     "gettext-parser": "^4.0.3",
     "google-protobuf": "^3.14.0",
     "node-gettext": "^3.0.0",
+    "patch-package": "^6.4.6",
     "rbush": "^2.0.2",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
@@ -90,7 +91,7 @@
     "vinyl-source-stream": "^2.0.0"
   },
   "scripts": {
-    "postinstall": "cross-env ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES=true electron-builder install-app-deps",
+    "postinstall": "patch-package && cross-env ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES=true electron-builder install-app-deps",
     "build": "gulp build",
     "build-proto": "gulp build-proto",
     "lint": "eslint --ext tsx,ts .",
