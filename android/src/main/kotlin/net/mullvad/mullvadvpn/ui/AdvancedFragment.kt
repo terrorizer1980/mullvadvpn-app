@@ -110,13 +110,16 @@ class AdvancedFragment : ServiceDependentFragment(OnNoService.GoBack) {
         }
 
         settingsListener.subscribe(this) { settings ->
+            android.util.Log.d("mullvad", "Updating UI for new settings $settings")
             updateUi(settings)
         }
     }
 
     private fun updateUi(settings: Settings) {
+        android.util.Log.d("mullvad", "New MTU value is ${settings.tunnelOptions.wireguard.mtu}")
         jobTracker.newUiJob("updateUi") {
             if (!wireguardMtuInput.hasFocus) {
+                android.util.Log.d("mullvad", "Changing widget to show new MTU value")
                 wireguardMtuInput.value = settings.tunnelOptions.wireguard.mtu
             }
         }

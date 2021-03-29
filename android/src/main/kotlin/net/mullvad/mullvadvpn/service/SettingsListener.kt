@@ -26,6 +26,7 @@ class SettingsListener(val daemon: MullvadDaemon, val initialSettings: Settings)
 
     init {
         daemon.onSettingsChange.subscribe(this) { maybeSettings ->
+            android.util.Log.d("mullvad", "New settings received $maybeSettings")
             maybeSettings?.let { settings -> handleNewSettings(settings) }
         }
     }
