@@ -1857,6 +1857,7 @@ where
     }
 
     fn on_set_wireguard_mtu(&mut self, tx: ResponseTx<(), settings::Error>, mtu: Option<u16>) {
+        log::debug!("Setting new WireGuard MTU value: {:?}", mtu);
         let save_result = self.settings.set_wireguard_mtu(mtu);
         match save_result {
             Ok(settings_changed) => {

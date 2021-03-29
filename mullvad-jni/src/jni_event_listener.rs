@@ -53,6 +53,7 @@ impl EventListener for JniEventListener {
     }
 
     fn notify_settings(&self, settings: Settings) {
+        log::debug!("Settings changed, notifying event handler");
         let _ = self.0.send(Event::Settings(settings));
     }
 
@@ -221,8 +222,10 @@ impl<'env> JniEventHandler<'env> {
     }
 
     fn handle_settings(&self, settings: Settings) {
+        log::debug!("Forwarding new settings");
         let java_settings = settings.into_java(&self.env);
 
+        log::debug!("Calling settings event listener");
         let result = self.env.call_method_unchecked(
             self.mullvad_ipc_client,
             self.notify_settings_event,

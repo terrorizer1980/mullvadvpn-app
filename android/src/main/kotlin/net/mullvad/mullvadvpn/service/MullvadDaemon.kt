@@ -201,6 +201,8 @@ class MullvadDaemon(val vpnService: MullvadVpnService) {
     }
 
     private fun notifySettingsEvent(settings: Settings) {
+        android.util.Log.d("mullvad", "Got new settings: $settings")
+        android.util.Log.d("mullvad", "New MTU value is: ${settings?.tunnelOptions?.wireguard?.options?.mtu}")
         onSettingsChange.notify(settings)
     }
 
