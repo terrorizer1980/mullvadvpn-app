@@ -28,6 +28,7 @@ class AdvancedFragment : ServiceDependentFragment(OnNoService.GoBack) {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        android.util.Log.d("mullvad", "Creating Advanced Settings screen")
         val view = inflater.inflate(R.layout.advanced, container, false)
 
         view.findViewById<View>(R.id.back).setOnClickListener {
@@ -64,6 +65,7 @@ class AdvancedFragment : ServiceDependentFragment(OnNoService.GoBack) {
     }
 
     override fun onSafelyDestroyView() {
+        android.util.Log.d("mullvad", "Destroying Advanced Settings screen")
         detachBackButtonHandler()
         customDnsAdapter.onDestroy()
         titleController.onDestroy()
@@ -71,9 +73,12 @@ class AdvancedFragment : ServiceDependentFragment(OnNoService.GoBack) {
     }
 
     private fun configureHeader(view: View) {
+        android.util.Log.d("mullvad", "Creating Advanced Settings header")
         wireguardMtuInput = view.findViewById<MtuCell>(R.id.wireguard_mtu).apply {
             onSubmit = { mtu ->
+                android.util.Log.d("mullvad", "Submiting new MTU: $mtu")
                 jobTracker.newBackgroundJob("updateMtu") {
+                    android.util.Log.d("mullvad", "Setting new MTU: $mtu")
                     daemon.setWireguardMtu(mtu)
                 }
             }
