@@ -29,8 +29,16 @@ class MtuCell : Cell {
     private val invalidInputColor = context.getColor(R.color.red)
 
     var value: Int?
-        get() = input.text.toString().trim().toIntOrNull()
-        set(value) = input.setText(value?.toString() ?: "")
+        get() {
+            val result = input.text.toString().trim().toIntOrNull()
+            android.util.Log.d("mullvad", "MTU value returned: $result")
+            return result
+        }
+        set(value) {
+            android.util.Log.d("mullvad", "MTU value being set to: $value")
+            input.setText(value?.toString() ?: "")
+            android.util.Log.d("mullvad", "MTU value was set to: ${input.text}", Exception())
+        }
 
     var onSubmit: ((Int?) -> Unit)? = null
 
@@ -68,12 +76,18 @@ class MtuCell : Cell {
     }
 
     inner class InputWatcher : TextWatcher {
-        override fun beforeTextChanged(text: CharSequence, start: Int, count: Int, after: Int) {}
+        override fun beforeTextChanged(text: CharSequence, start: Int, count: Int, after: Int) {
+            android.util.Log.d("mullvad", "Before MTU text changed: $text")
+        }
 
-        override fun onTextChanged(text: CharSequence, start: Int, count: Int, after: Int) {}
+        override fun onTextChanged(text: CharSequence, start: Int, count: Int, after: Int) {
+            android.util.Log.d("mullvad", "On MTU text changed: $text")
+        }
 
         override fun afterTextChanged(text: Editable) {
+            android.util.Log.d("mullvad", "After MTU text changed: $text")
             val value = text.toString().trim().toIntOrNull()
+            android.util.Log.d("mullvad", "  value: $value")
 
             if (value != null && value >= MIN_MTU_VALUE && value <= MAX_MTU_VALUE) {
                 input.setTextColor(validInputColor)
