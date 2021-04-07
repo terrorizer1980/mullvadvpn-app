@@ -1,4 +1,5 @@
-import moment from 'moment';
+// @ts-ignore
+import moment from 'moment/min/moment-with-locales.min';
 import { ILogInput, ILogOutput, LogLevel } from './logging-types';
 
 export class Logger {

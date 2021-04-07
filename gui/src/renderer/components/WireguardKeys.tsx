@@ -1,4 +1,5 @@
-import moment from 'moment';
+// @ts-ignore
+import moment from 'moment/min/moment-with-locales.min';
 import * as React from 'react';
 import { sprintf } from 'sprintf-js';
 import { TunnelState } from '../../shared/daemon-rpc-types';

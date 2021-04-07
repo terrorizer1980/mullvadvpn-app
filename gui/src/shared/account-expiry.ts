@@ -1,4 +1,5 @@
-import moment from 'moment';
+// @ts-ignore
+import moment from 'moment/min/moment-with-locales.min';
 import { sprintf } from 'sprintf-js';
 import { messages } from './gettext';
 import { capitalize } from './string-helpers';
