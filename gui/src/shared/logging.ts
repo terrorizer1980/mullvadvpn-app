@@ -1,4 +1,3 @@
-import moment from 'moment';
 import { ILogInput, ILogOutput, LogLevel } from './logging-types';
 
 export class Logger {
@@ -13,7 +12,7 @@ export class Logger {
   }
 
   public log(level: LogLevel, ...data: unknown[]) {
-    const time = moment().format('YYYY-MM-DD HH:mm:ss.SSS');
+    const time = new Date().toISOString();
     const stringifiedData = data.map(this.stringifyData).join(' ');
     const message = `[${time}][${LogLevel[level]}] ${stringifiedData}`;
 
