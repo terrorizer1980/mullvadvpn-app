@@ -1,7 +1,7 @@
 import React, { useCallback, useContext, useState } from 'react';
 import { VoucherResponse } from '../../shared/daemon-rpc-types';
 import { messages } from '../../shared/gettext';
-import { useScheduler } from '../../shared/scheduler';
+import { useScheduler } from '../../shared/use-scheduler';
 import { useAppContext } from '../context';
 import useActions from '../lib/actionsHook';
 import accountActions from '../redux/account/actions';

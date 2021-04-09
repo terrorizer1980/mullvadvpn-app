@@ -1,5 +1,3 @@
-import { useEffect, useMemo } from 'react';
-
 export class Scheduler {
   private timer?: NodeJS.Timeout;
   private running = false;
@@ -24,14 +22,4 @@ export class Scheduler {
   public get isRunning() {
     return this.running;
   }
-}
-
-export function useScheduler() {
-  const closeScheduler = useMemo(() => new Scheduler(), []);
-
-  useEffect(() => {
-    return () => closeScheduler.cancel();
-  }, []);
-
-  return closeScheduler;
 }
