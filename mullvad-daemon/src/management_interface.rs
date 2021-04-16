@@ -1547,6 +1547,10 @@ fn convert_state(state: TunnelState) -> types::TunnelState {
                     ErrorStateCause::VpnPermissionDenied => {
                         i32::from(ProtoErrorCause::VpnPermissionDenied)
                     }
+                    #[cfg(target_os = "windows")]
+                    ErrorStateCause::SplitTunnelError => {
+                        i32::from(ProtoErrorCause::SplitTunnelError)
+                    }
                 },
                 blocking_error: error_state.block_failure().map(map_firewall_error),
                 auth_fail_reason: if let ErrorStateCause::AuthFailed(reason) = error_state.cause() {
