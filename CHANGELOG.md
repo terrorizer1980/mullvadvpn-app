@@ -61,6 +61,7 @@ This release is for desktop only.
 - Make WireGuard automatic key rotation interval mandatory and between 1 and 7 days.
 - Show default, minimum, and maximum key rotation intervals in CLI.
 - Attempt to send problem reports using other endpoints if using the primary one fails.
+- Upgrade Electron from 11.2.3 to Electron 12.0.4.
 
 #### Android
 - Remove dialog warning that only custom local DNS servers are supported, since public custom DNS
