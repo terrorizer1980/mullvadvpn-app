@@ -496,6 +496,8 @@ impl Relay {
                                         protocol: protocol as i32,
                                     }
                                 }),
+                                // FIXME: Get old constraints
+                                exit_location: None,
                             }),
                             ..Default::default()
                         },
