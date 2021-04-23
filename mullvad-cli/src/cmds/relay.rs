@@ -167,6 +167,17 @@ impl Command for Relay {
                                     .default_value("any")
                                     .possible_values(&["any", "4", "6"]),
                             )
+                            .arg(
+                                clap::Arg::with_name("exit location")
+                                    .help("Exit endpoint to use. This can be 'any', 'none', or \
+                                           any location that is valid with 'set location', \
+                                           such as 'se got'.")
+                                    .default_value("none")
+                                    .long("exit-location")
+                                    .multiple(true)
+                                    .min_values(1)
+                                    .max_values(3),
+                            )
                     )
                     .subcommand(clap::SubCommand::with_name("tunnel-protocol")
                                 .about("Set tunnel protocol")
@@ -406,7 +417,7 @@ impl Relay {
     }
 
     async fn set_location(&self, matches: &clap::ArgMatches<'_>) -> Result<()> {
-        let location_constraint = location::get_constraint(matches);
+        let location_constraint = location::get_constraint_from_args(matches);
         let mut found = false;
 
         if !location_constraint.country.is_empty() {
@@ -492,11 +503,11 @@ impl Relay {
                 NormalRelaySettingsUpdate {
                     openvpn_constraints: Some(OpenvpnConstraints {
                         port: port.unwrap_or(0) as u32,
-                        protocol: protocol.option().map(|protocol| {
-                            TransportProtocolConstraint {
+                        protocol: protocol
+                            .option()
+                            .map(|protocol| TransportProtocolConstraint {
                                 protocol: protocol as i32,
-                            }
-                        }),
+                            }),
                     }),
                     ..Default::default()
                 },
@@ -508,19 +519,18 @@ impl Relay {
     async fn set_wireguard_constraints(&self, matches: &clap::ArgMatches<'_>) -> Result<()> {
         let port = parse_port_constraint(matches.value_of("port").unwrap())?;
         let ip_version = parse_ip_version_constraint(matches.value_of("ip version").unwrap());
+        let exit_location =
+            parse_exit_location_constraint(matches.values_of("exit location").unwrap());
 
         self.update_constraints(RelaySettingsUpdate {
             r#type: Some(relay_settings_update::Type::Normal(
                 NormalRelaySettingsUpdate {
                     wireguard_constraints: Some(WireguardConstraints {
                         port: port.unwrap_or(0) as u32,
-                        ip_version: ip_version.option().map(|protocol| {
-                            IpVersionConstraint {
-                                protocol: protocol as i32,
-                            }
+                        ip_version: ip_version.option().map(|protocol| IpVersionConstraint {
+                            protocol: protocol as i32,
                         }),
-                        // FIXME: Get old constraints
-                        exit_location: None,
+                        exit_location,
                     }),
                     ..Default::default()
                 },
@@ -794,4 +804,20 @@ fn parse_ip_version_constraint(raw_protocol: &str) -> Constraint<IpVersion> {
         "6" => Constraint::Only(IpVersion::V6),
         _ => unreachable!(),
     }
+}
+
+fn parse_exit_location_constraint<'a, T: Iterator<Item = &'a str>>(
+    mut location: T,
+) -> Option<RelayLocation> {
+    let country = location.next().unwrap();
+
+    if country == "none" {
+        return None;
+    }
+
+    Some(location::get_constraint(
+        country,
+        location.next(),
+        location.next(),
+    ))
 }

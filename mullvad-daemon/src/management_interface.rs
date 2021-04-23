@@ -976,8 +976,9 @@ fn convert_relay_settings_update(
                             Constraint::Any
                         },
                         ip_version: Constraint::from(ip_version),
-                        // FIXME: Hand over correct values. Distinguish between any & none
-                        exit_location: None,
+                        exit_location: constraints
+                            .exit_location
+                            .map(|location| convert_proto_location(location)),
                     }
                 }),
                 openvpn_constraints: settings.openvpn_constraints.map(|constraints| {
@@ -1031,8 +1032,11 @@ fn convert_relay_settings(settings: &RelaySettings) -> types::RelaySettings {
                         .map(|version| types::IpVersionConstraint {
                             protocol: i32::from(version),
                         }),
-                    // FIXME
-                    exit_location: None,
+                    exit_location: constraints
+                        .wireguard_constraints
+                        .exit_location
+                        .as_ref()
+                        .and_then(convert_location_constraint),
                 }),
 
                 openvpn_constraints: Some(types::OpenvpnConstraints {
