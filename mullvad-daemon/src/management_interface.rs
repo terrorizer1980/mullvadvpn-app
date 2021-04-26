@@ -887,7 +887,7 @@ fn convert_relay_settings_update(
                             endpoint,
                             protocol: convert_proto_transport_protocol(peer.protocol)?,
                         },
-                        additional_peers: vec![],
+                        exit_peer: None,
                         ipv4_gateway,
                         ipv6_gateway,
                     })
