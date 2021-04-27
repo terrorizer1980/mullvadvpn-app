@@ -976,8 +976,8 @@ fn convert_relay_settings_update(
                             Constraint::Any
                         },
                         ip_version: Constraint::from(ip_version),
-                        exit_location: constraints
-                            .exit_location
+                        entry_location: constraints
+                            .entry_location
                             .map(|location| convert_proto_location(location)),
                     }
                 }),
@@ -1032,9 +1032,9 @@ fn convert_relay_settings(settings: &RelaySettings) -> types::RelaySettings {
                         .map(|version| types::IpVersionConstraint {
                             protocol: i32::from(version),
                         }),
-                    exit_location: constraints
+                    entry_location: constraints
                         .wireguard_constraints
-                        .exit_location
+                        .entry_location
                         .as_ref()
                         .and_then(convert_location_constraint),
                 }),
