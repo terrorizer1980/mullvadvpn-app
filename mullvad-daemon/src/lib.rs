@@ -18,6 +18,7 @@ pub mod runtime;
 mod settings;
 pub mod version;
 mod version_check;
+mod resolver;
 
 use futures::{
     channel::{mpsc, oneshot},
@@ -525,6 +526,8 @@ where
         let (address_change_tx, mut address_change_rx) = mpsc::channel(0);
         let address_change_tx = std::sync::Mutex::new(address_change_tx);
         let address_change_runtime = tokio::runtime::Handle::current();
+
+        resolver::start_resolver();
 
         let mut rpc_runtime = mullvad_rpc::MullvadRpcRuntime::with_cache(
             tokio::runtime::Handle::current(),
