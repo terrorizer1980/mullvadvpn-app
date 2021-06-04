@@ -64,6 +64,7 @@ tun = "0.5.1"
 talpid-dbus = { path = "../talpid-dbus" }
 socket2 = "0.3"
 internet-checksum = "0.2"
+ondrop = "*"
 
 
 [target.'cfg(target_os = "macos")'.dependencies]

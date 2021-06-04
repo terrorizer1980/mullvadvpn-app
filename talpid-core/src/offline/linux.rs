@@ -108,6 +108,10 @@ pub async fn spawn_monitor(sender: Weak<UnboundedSender<TunnelCommand>>) -> Resu
 
 
     tokio::spawn(async move {
+        let _guard = ondrop::OnDrop::new(|| {
+            log::debug!("OFFLINE-MONITOR: offline monitor dropped");
+        });
+
         while let Some(new_message) = messages.next().await {
             log::debug!(
                 "OFFLINE-MONITOR: Received new netlink message: {:?}",
