@@ -108,13 +108,17 @@ pub async fn spawn_monitor(sender: Weak<UnboundedSender<TunnelCommand>>) -> Resu
 
 
     tokio::spawn(async move {
-        while let Some(_new_message) = messages.next().await {
+        while let Some(new_message) = messages.next().await {
+            log::debug!(
+                "OFFLINE-MONITOR: Received new netlink message: {:?}",
+                new_message
+            );
             match sender.upgrade() {
                 Some(sender) => {
                     let new_offline_state =
                         public_ip_unreachable(&handle).await.unwrap_or_else(|err| {
                             log::error!(
-                                "{}",
+                                "OFFLINE-MONITOR: {}",
                                 err.display_chain_with_msg("Failed to infer offline state")
                             );
                             false
@@ -145,7 +149,9 @@ async fn public_ip_unreachable(handle: &Handle) -> Result<bool> {
     message.header.destination_prefix_length = 32;
     message.header.flags = RouteFlags::RTM_F_LOOKUP_TABLE;
     let mut stream = execute_route_get_request(handle.clone(), message.clone());
-    match stream.try_next().await {
+    let message = stream.try_next().await;
+    log::debug!("OFFLINE-MONITOR: RECEIVED NETLINK MESSAGE - {:?}", message);
+    match message {
         // Presance of any route implies connectivity, even if it's a loopback route
         Ok(Some(_)) => Ok(false),
         Ok(None) => Err(Error::NoRouteError),
@@ -206,8 +212,8 @@ mod test {
         connection.socket_mut().bind(&addr).unwrap();
         runtime.spawn(connection);
 
-        runtime
+        assert!(!runtime
             .block_on(public_ip_unreachable(&handle))
-            .expect("Failed to query routing table");
+            .expect("Failed to query routing table"));
     }
 }
