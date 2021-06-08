@@ -48,6 +48,10 @@ class NotificationController: UIViewController, NotificationManagerDelegate {
             bannerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             bannerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
         ])
+
+        if #available(iOS 13.0, *) {
+            bannerView.accessibilityContainerType = .semanticGroup
+        }
     }
 
     override func viewDidLayoutSubviews() {

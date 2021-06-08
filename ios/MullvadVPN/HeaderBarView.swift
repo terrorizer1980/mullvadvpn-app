@@ -81,6 +81,10 @@ class HeaderBarView: UIView {
         [logoImageView, titleLabel, settingsButton].forEach { addSubview($0) }
 
         NSLayoutConstraint.activate(constraints)
+
+        if #available(iOS 13.0, *) {
+            accessibilityContainerType = .semanticGroup
+        }
     }
 
     required init?(coder: NSCoder) {
