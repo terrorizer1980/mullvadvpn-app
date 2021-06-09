@@ -1,13 +1,25 @@
 @font-face {
-  font-family: DINPro;
+  font-family: 'Source Sans Pro';
   font-weight: bold;
-  src: url('../fonts/DINPro-Bold.otf') format('opentype');
+  src: url('../fonts/SourceSansPro-Black.ttf') format('truetype');
 }
 
 @font-face {
-  font-family: DINPro;
+  font-family: 'Source Sans Pro';
   font-weight: 900;
-  src: url('../fonts/DINPro-Black.otf') format('opentype');
+  src: url('../fonts/SourceSansPro-Black.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Noto Sans';
+  font-weight: bold;
+  src: url('../fonts/NotoSansCJK-Black.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'Noto Sans';
+  font-weight: 900;
+  src: url('../fonts/NotoSansCJK-Black.otf') format('opentype');
 }
 
 @font-face {
