@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import { colors } from '../../config.json';
 import { messages } from '../../shared/gettext';
 import { IReduxState } from '../redux/store';
+import { sourceSansPro } from './common-styles';
 import ImageView from './ImageView';
 
 export enum HeaderBarStyle {
@@ -68,9 +69,8 @@ const BrandContainer = styled.div({
 });
 
 const Title = styled.span({
-  fontFamily: 'DINPro',
+  ...sourceSansPro,
   fontSize: '24px',
-  fontWeight: 900,
   lineHeight: '30px',
   color: colors.white80,
   marginLeft: '9px',
