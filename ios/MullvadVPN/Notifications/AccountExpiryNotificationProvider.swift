@@ -89,7 +89,8 @@ class AccountExpiryNotificationProvider: NotificationProvider, SystemNotificatio
         guard let triggerDate = Calendar.current.date(byAdding: .day, value: -triggerInterval, to: accountExpiry) else { return nil }
 
         // Only produce in-app notification within the last 3 days till expiry
-        guard triggerDate < Date() || triggerDate > accountExpiry else { return nil }
+        let now = Date()
+        guard triggerDate < now && now < accountExpiry else { return nil }
 
         // Format the remaining duration
         let formatter = DateComponentsFormatter()
@@ -97,7 +98,7 @@ class AccountExpiryNotificationProvider: NotificationProvider, SystemNotificatio
         formatter.allowedUnits = [.minute, .hour, .day]
         formatter.maximumUnitCount = 1
 
-        guard let duration = formatter.string(from: Date(), to: accountExpiry) else { return nil }
+        guard let duration = formatter.string(from: now, to: accountExpiry) else { return nil }
 
         return InAppNotificationDescriptor(
             identifier: self.identifier,

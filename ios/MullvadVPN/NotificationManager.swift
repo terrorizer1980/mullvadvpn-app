@@ -169,10 +169,10 @@ class NotificationManager: NotificationProviderDelegate {
     func notificationProviderDidInvalidate(_ notificationProvider: NotificationProvider) {
         assert(Thread.isMainThread)
 
-        let notificationCenter = UNUserNotificationCenter.current()
-
         // Invalidate system notification
         if let notificationProvider = notificationProvider as? SystemNotificationProvider {
+            let notificationCenter = UNUserNotificationCenter.current()
+
             if notificationProvider.shouldRemovePendingRequests {
                 notificationCenter.removePendingNotificationRequests(withIdentifiers: [notificationProvider.identifier])
             }
