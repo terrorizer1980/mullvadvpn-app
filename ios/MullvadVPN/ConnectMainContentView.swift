@@ -92,6 +92,10 @@ class ConnectMainContentView: UIView {
         backgroundColor = .primaryColor
         layoutMargins = UIMetrics.contentLayoutMargins
 
+        if #available(iOS 13.0, *) {
+            accessibilityContainerType = .semanticGroup
+        }
+
         addSubviews()
     }
 
