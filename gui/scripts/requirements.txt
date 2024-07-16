@@ -96,3 +96,4 @@ tinycss2==1.0.2 \
 webencodings==0.5.1 \
     --hash=sha256:a0af1213f3c2226497a97e2b3aa01a7e4bee4f403f95be16fc9acd2947514a78 \
     --hash=sha256:b36a1c245f2d304965eb4e0a82848379241dc04b865afcc4aab16748587e1923
+setuptools>=70.0.0 # not directly required, pinned by Snyk to avoid a vulnerability
