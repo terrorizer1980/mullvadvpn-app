@@ -1,4 +1,4 @@
-Fiona==1.8.13.post1 \
+Fiona==1.10b2.post1 \
     --hash=sha256:1a432bf9fd56f089256c010da009c90d4a795c531a848132c965052185336600 \
     --hash=sha256:79c3b80e00c9d055d20aead5d74319f54cdd1384e0d9e1a9e67446da2d74d89c \
     --hash=sha256:923a64bded457adee795b4f926b8cbb87d58bbafaabded77bc1d47abb2bba5c6
