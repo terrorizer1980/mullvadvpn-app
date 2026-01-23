@@ -30,8 +30,8 @@
     "uuid": "^3.0.1"
   },
   "optionalDependencies": {
-    "grpc-tools": "^1.10.0",
-    "nseventmonitor": "^1.0.0"
+    "grpc-tools": "^1.11.2",
+    "nseventmonitor": "^1.0.5"
   },
   "devDependencies": {
     "@types/chai": "^4.1.7",
